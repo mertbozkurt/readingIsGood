@@ -25,7 +25,6 @@ public class CustomerFacade {
     @Autowired
     CustomerService customerService;
 
-
     public List<CustomerProfileDTO> getCustomerProfiles() {
 
         return customerDTOMapper.convertModelToCustomerProfileDTOList(customerService.getCustomerList());

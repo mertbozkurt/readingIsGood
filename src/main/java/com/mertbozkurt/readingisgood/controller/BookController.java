@@ -5,6 +5,7 @@ import com.mertbozkurt.readingisgood.dto.customer.CustomerProfileDTO;
 import com.mertbozkurt.readingisgood.dto.customer.CustomerProfilesDTO;
 import com.mertbozkurt.readingisgood.facade.BookFacade;
 import com.mertbozkurt.readingisgood.facade.CustomerFacade;
+import com.mertbozkurt.readingisgood.facade.StockFacade;
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class BookController {
 
     @Autowired
     private BookFacade bookFacade;
+    private StockFacade stockFacade;
 
 
     @PostMapping
@@ -34,6 +36,18 @@ public class BookController {
 
         } catch (HttpClientErrorException.BadRequest exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New Book could not be created");
+        }
+
+    }
+
+    @PostMapping("/{bookId}/{stock}")
+    public ResponseEntity updateBookStock (@PathVariable("stock") int stock ,@PathVariable("bookId") long bookId) {
+
+        try {
+            return ResponseEntity.ok(stockFacade.updateBookStock(bookId,stock));
+
+        } catch (HttpClientErrorException.BadRequest exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Stock could not be created");
         }
 
     }
