@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,13 +27,12 @@ public class CustomerController {
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SS");
 
     @GetMapping("/profiles")
-    public ResponseEntity getAllCustomerProfiles(@RequestParam(value = "updatedAfter", required = false) String updatedAfter,
-                                                 @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+    public ResponseEntity getAllCustomerProfiles(@RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
                                                  @RequestParam(value = "limit", required = false, defaultValue = "100") int limit) {
 
         try {
             CustomerProfilesDTO customerProfilesDTO = new CustomerProfilesDTO();
-            List<CustomerProfileDTO> customerProfileDTOList = customerFacade.getCustomerProfiles(convertStringToLocalDateTime(updatedAfter));
+            List<CustomerProfileDTO> customerProfileDTOList = customerFacade.getCustomerProfiles();
             if (CollectionUtils.isNotEmpty(customerProfileDTOList)) {
                 if (offset < customerProfileDTOList.size()) {
                     int upperBound = offset + limit;
@@ -46,26 +46,31 @@ public class CustomerController {
             }
             return ResponseEntity.ok(customerProfilesDTO);
 
-        } catch (DateTimeParseException exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("updatedAfter parameter should be yyyy-MM-dd'T'HH:mm:ss.SS format ");
         } catch (IndexOutOfBoundsException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset and Limit are not in the range");
         }
     }
 
 
-    @PostMapping(path = "/add")
+    @GetMapping("/{customerId}")
+    public ResponseEntity getExporterProfile(@PathVariable("customerId") long customerId) {
+        try {
+
+            CustomerProfileDTO customerProfileDTO = customerFacade.getCustomerInformation(customerId);
+            return ResponseEntity.ok(customerProfileDTO);
+
+        } catch (HttpClientErrorException.NotFound exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is customer with an ID" + customerId );
+        }
+
+    }
+
+
+    @PostMapping
     public void addCustomer(@RequestBody  CustomerProfileDTO customerProfileDTO){
         //todo check if customer exists in facade
         customerFacade.addCustomer(customerProfileDTO);
     }
-    private LocalDateTime convertStringToLocalDateTime(String date) {
 
-        LocalDateTime updateDateTime = null;
-        if (date != null) {
-            updateDateTime = LocalDateTime.parse(date, dateTimeFormatter);
-        }
-        return updateDateTime;
-    }
 
 }

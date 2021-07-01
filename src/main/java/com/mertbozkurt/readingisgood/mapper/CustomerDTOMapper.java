@@ -2,6 +2,8 @@ package com.mertbozkurt.readingisgood.mapper;
 
 import com.mertbozkurt.readingisgood.dto.customer.CustomerProfileDTO;
 import com.mertbozkurt.readingisgood.model.Customer;
+import com.mertbozkurt.readingisgood.model.Order;
+import com.mertbozkurt.readingisgood.service.OrderService;
 import org.modelmapper.config.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,12 +12,16 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class CustomerDTOMapper {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    OrderService orderService;
 
 
     public Customer convertCustomerProfileDTOToCustomer(CustomerProfileDTO customerProfileDTO) {
@@ -41,5 +47,17 @@ public class CustomerDTOMapper {
         }
         return customerProfileDTOList;
 
+    }
+
+    public CustomerProfileDTO convertModelToCustomerProfileDTO(Optional<Customer> customer) {
+        modelMapper.getConfiguration()
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+
+        CustomerProfileDTO customerProfileDTO = modelMapper.map(customer, CustomerProfileDTO.class);
+        List<Order> orderList = orderService.getCustomerOrders(customer.get().getId());
+        customerProfileDTO.setOrders(orderList);
+
+        return customerProfileDTO;
     }
 }
