@@ -31,4 +31,21 @@ public class StockService {
         return stockRepository.save(stock);
 
     }
+
+    public Stock decreaseStock(long bookId) {
+
+        Stock stock =stockRepository.findByBookId(bookId);
+        if (stock!=null) {
+            stock.setStock(stock.getStock()-1);
+        }
+
+        return stockRepository.save(stock);
+
+    }
+
+    public Stock getStock(long bookId) {
+        return stockRepository.findByBookId(bookId);
+
+    }
+
 }

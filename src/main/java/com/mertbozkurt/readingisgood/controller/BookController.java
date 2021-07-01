@@ -28,7 +28,7 @@ public class BookController {
 
 
     @PostMapping
-    public ResponseEntity creatBook(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity createBook(@RequestBody BookDTO bookDTO) {
 
         try {
             bookFacade.createBook(bookDTO);
@@ -41,13 +41,13 @@ public class BookController {
     }
 
     @PostMapping("/{bookId}/{stock}")
-    public ResponseEntity updateBookStock (@PathVariable("stock") int stock ,@PathVariable("bookId") long bookId) {
+    public ResponseEntity updateBookStock(@PathVariable("stock") int stock, @PathVariable("bookId") long bookId) {
 
         try {
-            return ResponseEntity.ok(stockFacade.updateBookStock(bookId,stock));
+            return ResponseEntity.ok(stockFacade.updateBookStock(bookId, stock));
 
         } catch (HttpClientErrorException.BadRequest exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Stock could not be created");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Stock could not be updated");
         }
 
     }
