@@ -24,7 +24,7 @@ public class CustomerFacade {
 
     @Autowired
     CustomerService customerService;
-    OrderService orderService;
+
 
     public List<CustomerProfileDTO> getCustomerProfiles() {
 
